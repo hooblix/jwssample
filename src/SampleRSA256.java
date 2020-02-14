@@ -13,6 +13,11 @@ import com.auth0.jwt.exceptions.JWTCreationException;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 
+/*
+ * sample code for using auth0 java-jwt library
+ * auth0 java-jwt library:	https://github.com/auth0/java-jwt
+ * useful online decode site:	https://jwt.io/
+ */
 public class SampleRSA256 {
 
     public static void main(String[] args) {
@@ -44,9 +49,10 @@ public class SampleRSA256 {
         	cal.setTimeInMillis(later);
         	Date expiresAt = cal.getTime();
             
+        	// pick your issuer name such as janus
             Algorithm algorithmRS = Algorithm.RSA256(null, privateKey);
             token = JWT.create()
-            	.withIssuer("2xt")
+            	.withIssuer("janus")
             	.withIssuedAt(issueAt)
             	.withExpiresAt(expiresAt)
             	.withClaim("email", "hanbin.pang@centurylink.com")
@@ -63,7 +69,7 @@ public class SampleRSA256 {
         try {
         	Algorithm algorithm = Algorithm.RSA256(publicKey, null);
             JWTVerifier verifier = JWT.require(algorithm)
-            	.withIssuer("2xt")
+            	.withIssuer("janus")
             	// accept 600 seconds after issueAt (iat)
             	//.acceptLeeway(600)
             	.build(); //Reusable verifier instance

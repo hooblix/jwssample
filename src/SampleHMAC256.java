@@ -8,6 +8,12 @@ import com.auth0.jwt.exceptions.JWTCreationException;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 
+/*
+ * sample code for using auth0 java-jwt library 
+ * auth0 java-jwt library:	https://github.com/auth0/java-jwt
+ * useful online decode site:	https://jwt.io/
+ * 
+ */
 public class SampleHMAC256 {
 
     public static void main(String[] args) {
@@ -22,13 +28,15 @@ public class SampleHMAC256 {
         	cal.setTimeInMillis(later);
         	Date expiresAt = cal.getTime();
         	
+        	// use HMAC256 algorithm with secret "secret" (choose the secret shared between two parties)
+        	// pick your issuer name such as janus
             Algorithm algorithm = Algorithm.HMAC256("secret");
             token = JWT.create()
-            	.withIssuer("2xt")
+            	.withIssuer("janus")
             	.withIssuedAt(issueAt)
             	.withExpiresAt(expiresAt)
             	.withClaim("email", "hanbin.pang@centurylink.com")
-            	.withClaim("wtn", "16142154777")
+            	.withClaim("phone", "16142154777")
                 .sign(algorithm);
             System.out.println("token:" + token);
         } 
@@ -39,18 +47,32 @@ public class SampleHMAC256 {
         
         // verify token and get claim
         try {
+        	
+        	// decode jwt token without knowing secret
+        	/*
+            DecodedJWT decoded_jwt = JWT.decode(token);
+            System.out.println("iss: " + decoded_jwt.getIssuer());
+            System.out.println("iat: " + decoded_jwt.getIssuedAt());
+            System.out.println("exp: " + decoded_jwt.getExpiresAt());
+            System.out.println("email: " + decoded_jwt.getClaim("email").asString());
+            System.out.println("phone: " + decoded_jwt.getClaim("phone").asString());
+            */
+        	
+            // use HMAC256 algorithm with secret "secret" (choose the secret shared between two parties)
+        	// require issuer name to be janus to verify token
             Algorithm algorithm = Algorithm.HMAC256("secret");
             JWTVerifier verifier = JWT.require(algorithm)
-            	.withIssuer("2xt")
-            	// accept 600 seconds after issueAt (iat)
-            	//.acceptLeeway(600)
-            	.build(); //Reusable verifier instance
-            DecodedJWT jwt = verifier.verify(token);
-            System.out.println("iss: " + jwt.getIssuer());
-            System.out.println("iat: " + jwt.getIssuedAt());
-            System.out.println("exp: " + jwt.getExpiresAt());
-            System.out.println("email: " + jwt.getClaim("email").asString());
-            System.out.println("wtn: " + jwt.getClaim("wtn").asString());
+                    .withIssuer("janus")
+                    // accept 600 seconds after issueAt (iat)
+                    //.acceptLeeway(600)
+                    .build(); //Reusable verifier instance
+            DecodedJWT verified_jwt = verifier.verify(token);
+            System.out.println("iss: " + verified_jwt.getIssuer());
+            System.out.println("iat: " + verified_jwt.getIssuedAt());
+            System.out.println("exp: " + verified_jwt.getExpiresAt());
+            System.out.println("email: " + verified_jwt.getClaim("email").asString());
+            System.out.println("phone: " + verified_jwt.getClaim("phone").asString());
+            
         }
         catch (JWTVerificationException exception) {
             //Invalid signature/claims
